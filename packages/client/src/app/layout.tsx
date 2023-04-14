@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "Syllabus Schedule Generator by Conor Roberts",
   description:
-    "Don't Waste Time with Due Dates. Upload your course syllabus, and get back a file you can import into your favourite calendar app!",
+    "Don't waste time with due dates. Upload your course syllabus, and get back a file you can import into your favourite calendar app!",
   openGraph: {
     images: [
       {

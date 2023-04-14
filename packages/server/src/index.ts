@@ -1,4 +1,8 @@
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import cors from "@fastify/cors";
 import fastify from "fastify";
 import ical from "ical-generator";
@@ -62,6 +66,7 @@ server.post("/pdf/process", async (req, res) => {
   const openaiResponses: CalendarEvent[][] = await Promise.all(
     request.data.keys.map(async (key) => {
       try {
+        req.log.info(`Processing file from R2 with key: ${key}`);
         const obj = await s3.send(
           new GetObjectCommand({
             Bucket: env.data.R2_BUCKET_NAME,
@@ -82,6 +87,8 @@ server.post("/pdf/process", async (req, res) => {
         const textChunks: ChatCompletionRequestMessage[] = (
           fullText.match(/.{1,2500}/g) ?? []
         ).map((e) => ({ content: e, role: "user" }));
+
+        req.log.info(`Requesting completion for key: ${key}`);
 
         const completion = await openai.createChatCompletion({
           model: "gpt-3.5-turbo",
@@ -115,6 +122,26 @@ server.post("/pdf/process", async (req, res) => {
     })
   );
 
+  req.log.info(
+    `Deleting files from R2 with keys: ${JSON.stringify(request.data.keys)}`
+  );
+
+  // Delete files
+  await Promise.all(
+    request.data.keys.map((key) =>
+      s3.send(
+        new DeleteObjectCommand({
+          Bucket: env.data.R2_BUCKET_NAME,
+          Key: key,
+        })
+      )
+    )
+  );
+
+  req.log.info(
+    `Creating calendar with ${openaiResponses.flat().length} events`
+  );
+
   for (const r of openaiResponses.flat()) {
     calendar.createEvent(r);
   }
@@ -124,10 +151,7 @@ server.post("/pdf/process", async (req, res) => {
   return res.type(blob.type).send(Buffer.from(await blob.arrayBuffer()));
 });
 
-server.all("/", async (req, res) => {
-  return res.send({ message: "Hello World!" });
-});
-server.all("/health", async (req, res) => {
+server.all("/", async (_req, res) => {
   return res.send({ message: "Hello World!" });
 });
 

@@ -38,7 +38,7 @@ const calendarEventSchema = z.object({
   end: z.string(),
   summary: z.string(),
   description: z.string(),
-  location: z.string(),
+  location: z.string().optional(),
 });
 type CalendarEvent = z.infer<typeof calendarEventSchema>;
 
@@ -61,7 +61,7 @@ server.post("/pdf/process", async (req, res) => {
     return res.status(400).send({ message: request.error.issues[0].message });
   }
 
-  const calendar = ical({ name: "my first iCal" });
+  const calendar = ical({ name: "Calendar" });
 
   const openaiResponses: CalendarEvent[][] = await Promise.all(
     request.data.keys.map(async (key) => {
@@ -99,7 +99,7 @@ server.post("/pdf/process", async (req, res) => {
                 eventSchema
               )} where both 'start' and 'end' are in the ISO date string format with a timezone offset of -${
                 new Date().getTimezoneOffset() / 60
-              }. The response should be a JSON array of schema. Events without a clear end time should have an end time equal to the start time. Wherever the year value of a date is ambiguous, use the year ${new Date().getFullYear()}. The syllabus:\n`,
+              }. The response should be a JSON array of schema. Events without a clear end time should have an end time equal to the start time. Wherever the year value of a date is ambiguous, use the year ${new Date().getFullYear()}. If a course code is found, prefix the 'summary' field with it for each event within that course. The syllabus:\n`,
             },
             ...textChunks,
           ],
@@ -112,6 +112,11 @@ server.post("/pdf/process", async (req, res) => {
           if (parsed.success) {
             return parsed.data;
           }
+
+          req.log.error(
+            "Failed to parse completion" +
+              completion.data.choices[0].message?.content
+          );
         }
 
         return [];

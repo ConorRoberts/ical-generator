@@ -68,6 +68,9 @@ const UploadForm = () => {
       >
         {({ getRootProps, getInputProps, isDragActive }) => (
           <>
+            <p className="text-center text-gray-400 mb-2 text-sm">
+              Processing time is usually 15-30 seconds.
+            </p>
             <div
               {...getRootProps()}
               className={clsx(

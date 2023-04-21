@@ -1,0 +1,15 @@
+{
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": false,
+		"indentStyle": "space",
+		"indentSize": 2,
+		"lineWidth": 120,
+		"ignore": ["**/node_modules", "**/build", "**/dist"]
+	},
+	"javascript": {
+		"formatter": {
+			"trailingComma": "es5"
+		}
+	}
+}

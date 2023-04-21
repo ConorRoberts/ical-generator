@@ -114,8 +114,8 @@ server.post("/pdf/process", async (req, res) => {
           }
 
           req.log.error(
-            "Failed to parse completion" +
-              completion.data.choices[0].message?.content
+            `Failed to parse completion 
+              ${completion.data.choices[0].message?.content}`
           );
         }
 

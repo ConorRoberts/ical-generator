@@ -2,6 +2,8 @@ import { AiFillGithub } from "react-icons/ai";
 import Calendar from "./Calendar";
 import UploadForm from "./UploadForm";
 
+export const revalidate = 10800;
+
 const Home = () => {
   return (
     <div className="sm:pb-96 py-8">
@@ -15,8 +17,7 @@ const Home = () => {
                     Don&apos;t Waste Time with Due Dates
                   </h1>
                   <p className="mt-6 text-lg leading-8 text-gray-600">
-                    Upload your course syllabus, and get back a file you can
-                    import into your favourite calendar app!
+                    Upload your course syllabus, and get back a file you can import into your favourite calendar app!
                   </p>
                   <div className="mt-10 flex items-center gap-x-6">
                     <a
